@@ -1,3 +1,5 @@
+#!/bin/bash
+
 search_dir=./input/
 for file in "${search_dir}"* ;
 do
