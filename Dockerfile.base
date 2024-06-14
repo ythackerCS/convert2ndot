@@ -1,0 +1,22 @@
+FROM ubuntu:20.04
+
+WORKDIR /workspace
+COPY ./workspace /workspace/
+
+
+RUN apt-get -qq update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -qq install -y unzip wget curl xorg && \
+    mkdir /mcr-install && \
+    mkdir /opt/mcr && \
+    cd /mcr-install && \
+    wget https://ssd.mathworks.com/supportfiles/downloads/R2021b/Release/7/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021b_Update_7_glnxa64.zip && \
+    unzip -q MATLAB_Runtime_R2021b_Update_7_glnxa64.zip && \
+    ./install -destinationFolder /opt/MATLAB/MATLAB_Runtime -agreeToLicense yes -mode silent && \
+    cd / && \
+    rm -rf mcr-install
+    
+ENV PORT=8080
+
+ENV LD_LIBRARY_PATH /opt/MATLAB/MATLAB_Runtime/v99/runtime/glnxa64:/opt/MATLAB/MATLAB_Runtime/v99/bin/glnxa64:/opt/MATLAB/MATLAB_Runtime/v99/sys/os/glnxa64:/opt/MATLAB/MATLAB_Runtime/v99/sys/opengl/lib/glnxa64
+
+USER root

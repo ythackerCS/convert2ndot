@@ -1,0 +1,91 @@
+{
+  "name": "neurodot-convert2ndot",
+  "label": "neurodot-convert2ndot",
+  "description": "Runs convert2ndot on subject data",
+  "version": "1.0",
+  "schema-version": "1.0",
+  "image": "registry.nrg.wustl.edu/docker/nrg-repo/yash/convert2ndot_bids:latest",
+  "type": "docker",
+  "command-line": "./run.sh",
+  "override-entrypoint": true,
+  "mounts": [
+    {
+      "name": "scan-in",
+      "writable": true,
+      "path": "/input/"
+    },
+    {
+      "name": "mat-out",
+      "writable": true,
+      "path": "/output"
+    },
+    {
+      "name": "tmp",
+      "writable": true,
+      "path": "/tmp"
+    }
+  ],
+  "environment-variables": {
+    "MCR_CACHE_ROOT": "/tmp"
+  },
+  "ports": {},
+  "inputs": [
+  ],
+  "outputs": [
+    {
+      "name": "mat-file",
+      "description": "The converted mat file",
+      "required": true,
+      "mount": "mat-out"
+    }
+  ],
+  "xnat": [
+    {
+      "name": "Run convert2ndot with subject data mounted",
+      "label": "convert2ndot",
+      "description": "Convert snirf or nirs data to ndot mat type with resource folder mounted",
+      "contexts": [
+        "xnat:imageScanData"
+      ],
+      "external-inputs": [
+        {
+          "name": "scan",
+          "description": "Input scan",
+          "type": "Scan",
+          "matcher": "",
+          "required": true,
+          "load-children": true
+        }
+      ],
+      "derived-inputs": [
+        {
+          "name": "scanResource",
+          "type": "Resource",
+          "matcher": "@.label =~ /.*FNIRS.*/i",
+          "required": true,
+          "provides-files-for-command-mount": "scan-in",
+          "user-settable": true,
+          "load-children": true,
+          "derived-from-wrapper-input": "scan",
+          "multiple": false
+        }
+      ],
+      "output-handlers": [
+        {
+          "name": "scanResource",
+          "accepts-command-output": "mat-file",
+          "as-a-child-of": "scan",
+          "type": "Resource",
+          "label": "FNIRS",
+          "tags": []
+        }
+      ]
+    }
+  ],
+  "reserve-memory": 6192,
+  "limit-memory": 6192,
+  "container-labels": {},
+  "generic-resources": {},
+  "ulimits": {},
+  "secrets": []
+}
